@@ -24,6 +24,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nicolastakashi/cole/internal/command"
+	"github.com/nicolastakashi/cole/internal/logging"
+
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 )
@@ -39,6 +43,13 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if err := logging.Configure(scmd.LogLevel); err != nil {
+			os.Exit(1)
+		}
+
+		logrus.Info("Welcome to cole...")
+
 		ctx, cancel := context.WithCancel(context.Background())
 		wg, ctx := errgroup.WithContext(ctx)
 
@@ -49,7 +60,7 @@ to quickly create a Cobra application.`,
 
 		wg.Go(func() error {
 			if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-				// logrus.Error("msg", "http server error", err, err)
+				logrus.Error("msg", "http server error", err, err)
 				return err
 			}
 			return nil
@@ -57,18 +68,18 @@ to quickly create a Cobra application.`,
 
 		select {
 		case <-term:
-			// logrus.Info("received SIGTERM, exiting gracefully...")
+			logrus.Info("received SIGTERM, exiting gracefully...")
 		case <-ctx.Done():
 		}
 
 		if err := srv.Shutdown(ctx); err != nil {
-			log.Printf("server shutdown error ", err)
+			logrus.Error("server shutdown error ", err)
 		}
 
 		cancel()
 
 		if err := wg.Wait(); err != nil {
-			// logrus.Error("unhandled error received. Exiting...", err)
+			logrus.Error("unhandled error received. Exiting...", err)
 			os.Exit(1)
 		}
 
@@ -78,9 +89,11 @@ to quickly create a Cobra application.`,
 }
 
 var serverPort = ""
+var scmd = &command.Server{}
 
 func init() {
 	serverCmd.Flags().StringVar(&serverPort, "http.port", ":9754", "listem port for http endpoints")
+	serverCmd.Flags().StringVar(&scmd.LogLevel, "log.level", logrus.InfoLevel.String(), "listem port for http endpoints")
 	rootCmd.AddCommand(serverCmd)
 
 }
