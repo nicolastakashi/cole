@@ -24,6 +24,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/logging"
 
@@ -66,6 +67,13 @@ to quickly create a Cobra application.`,
 			return nil
 		})
 
+		wg.Go(func() error {
+			if err := cole.Start(ctx, *scmd); err != nil {
+				return err
+			}
+			return nil
+		})
+
 		select {
 		case <-term:
 			logrus.Info("received SIGTERM, exiting gracefully...")
@@ -94,8 +102,10 @@ var scmd = &command.Server{}
 func init() {
 	serverCmd.Flags().StringVar(&serverPort, "http.port", ":9754", "listem port for http endpoints")
 	serverCmd.Flags().StringVar(&scmd.LogLevel, "log.level", logrus.InfoLevel.String(), "listem port for http endpoints")
+	serverCmd.Flags().StringVar(&scmd.KubeConfig, "kubeconfig", "", "(optional) absolute path to the kubeconfig file")
+	serverCmd.Flags().StringVar(&scmd.Namespace, "namespace", "default", "namespace that will store the dashboard config map")
+	serverCmd.Flags().StringVar(&scmd.LabelSelector, "labelselector", "", "Grafana pod label selector")
 	rootCmd.AddCommand(serverCmd)
-
 }
 
 func createHttpServer(port string) *http.Server {
