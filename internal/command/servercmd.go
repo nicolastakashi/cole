@@ -1,5 +1,8 @@
 package command
 
 type Server struct {
-	LogLevel string
+	LogLevel      string
+	KubeConfig    string
+	Namespace     string
+	LabelSelector string
 }
