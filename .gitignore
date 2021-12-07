@@ -196,3 +196,4 @@ $RECYCLE.BIN/
 *.lnk
 bin
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,helm,linux,macos,windows,goland
+.vscode/launch.json
