@@ -27,6 +27,9 @@ import (
 	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/logging"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/version"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -58,6 +61,14 @@ to quickly create a Cobra application.`,
 		signal.Notify(term, os.Interrupt, syscall.SIGTERM)
 
 		srv := createHttpServer(serverPort)
+
+		err := prometheus.DefaultRegisterer.Register(version.NewCollector("gitana"))
+
+		if err != nil {
+			logrus.Errorf("error to register version collector %v", err)
+		}
+
+		logrus.Info("listen on " + serverPort)
 
 		wg.Go(func() error {
 			if err := srv.ListenAndServe(); err != http.ErrServerClosed {
@@ -111,6 +122,7 @@ func init() {
 func createHttpServer(port string) *http.Server {
 	mux := http.NewServeMux()
 
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("/-/health", func(rw http.ResponseWriter, _ *http.Request) {
 		rw.WriteHeader(http.StatusOK)
 		rw.Header().Set("Content-Type", "application/json")
