@@ -2,15 +2,34 @@ package loghandler
 
 import (
 	"regexp"
-	"strings"
 
+	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var regexDashboardPath = regexp.MustCompile(`\/api\/dashboards\/uid\/.+`)
 
+var dashboardViewTotal = promauto.NewCounterVec(
+	prometheus.CounterOpts{
+		Namespace: "cole",
+		Name:      "dashboard_view_total",
+		Help:      "Total number of views of a dashboard",
+	},
+	[]string{"dashboard_uid", "org_id", "user_id", "user_name"},
+)
+
+var dashboardLastView = promauto.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Namespace: "cole",
+		Name:      "dashboard_last_view_seconds",
+		Help:      "dashboard last view in seconds",
+	},
+	[]string{"dashboard_uid", "org_id", "user_id", "user_name"},
+)
+
 type DashboardLogHandler struct {
-	next handler
 }
 
 func (dlh *DashboardLogHandler) Handle(ll k8sclient.LogLine) {
@@ -20,18 +39,10 @@ func (dlh *DashboardLogHandler) Handle(ll k8sclient.LogLine) {
 		return
 	}
 
-	splitedPath := strings.Split(path, "/")
+	dl := entities.NewDashboardLog(ll)
 
-	if len(splitedPath) < 4 {
-		return
+	if ll.KeyValue["status"] == "200" {
+		dashboardViewTotal.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).Inc()
+		dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).SetToCurrentTime()
 	}
-
-	dashboardUid := splitedPath[4]
-	orgId := ll.KeyValue["orgId"]
-	uid := ll.KeyValue["userId"]
-	uname := ll.KeyValue["uname"]
-
-	print(dashboardUid, uid, uname, orgId)
-
-	dlh.next.Handle(ll)
 }
