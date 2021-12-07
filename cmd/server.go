@@ -62,7 +62,7 @@ to quickly create a Cobra application.`,
 
 		srv := createHttpServer(serverPort)
 
-		err := prometheus.DefaultRegisterer.Register(version.NewCollector("gitana"))
+		err := prometheus.DefaultRegisterer.Register(version.NewCollector("cole"))
 
 		if err != nil {
 			logrus.Errorf("error to register version collector %v", err)
