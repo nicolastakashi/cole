@@ -6,6 +6,7 @@ import (
 
 	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
+	"github.com/nicolastakashi/cole/internal/loghandler"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,7 +17,7 @@ func Start(ctx context.Context, scmd command.Server) error {
 		return err
 	}
 	t := time.NewTimer(1 * time.Millisecond)
-	lastSinceTime := time.Now()
+	lastSinceTime := time.Now().Add(time.Duration(-24) * time.Hour)
 
 	for {
 		select {
@@ -41,12 +42,25 @@ func start(ctx context.Context, scmd command.Server, client *k8sclient.K8sClient
 	pods, err := client.ListPods(ctx, scmd.Namespace, scmd.LabelSelector)
 
 	if err != nil {
+		logrus.Errorf("error to lost pods ", err)
 		return err
 	}
 
+	logs := []k8sclient.LogLine{}
+
 	for _, pod := range pods {
-		client.GetPodLogs(ctx, scmd.Namespace, pod, *lastSinceTime)
-		*lastSinceTime = time.Now()
+		logs, err = client.GetPodLogs(ctx, scmd.Namespace, pod, *lastSinceTime)
+		if err != nil {
+			logrus.Errorf("error to get pod %v logs ", pod.Name, err)
+			return err
+		}
 	}
+
+	*lastSinceTime = time.Now()
+	logHandler := loghandler.New()
+	for _, log := range logs {
+		logHandler.Handle(log)
+	}
+
 	return nil
 }
