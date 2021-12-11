@@ -13,8 +13,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type K8sClient struct {
-	client kubernetes.Clientset
+type Client interface {
+	ListPods(namespace string, labelSelector string) ([]v1.Pod, error)
+	GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) ([]LogLine, error)
+}
+
+type KClient struct {
+	ClientSet kubernetes.Interface
+	Ctx       context.Context
 }
 
 type LogLine struct {
@@ -22,7 +28,7 @@ type LogLine struct {
 	KeyValue   map[string]string
 }
 
-func New(kubeConfig string) (*K8sClient, error) {
+func NewTwo(ctx context.Context, kubeConfig string) (*KClient, error) {
 	var config *rest.Config = nil
 	var err error = nil
 
@@ -46,13 +52,14 @@ func New(kubeConfig string) (*K8sClient, error) {
 		return nil, err
 	}
 
-	return &K8sClient{
-		client: *clientset,
+	return &KClient{
+		Ctx:       ctx,
+		ClientSet: clientset,
 	}, nil
 }
 
-func (kc *K8sClient) ListPods(ctx context.Context, namespace string, labelSelector string) (map[string]v1.Pod, error) {
-	pods, err := kc.client.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+func (c KClient) ListPods(namespace string, labelSelector string) ([]v1.Pod, error) {
+	pods, err := c.ClientSet.CoreV1().Pods(namespace).List(c.Ctx, metav1.ListOptions{
 		LabelSelector: labelSelector,
 	})
 
@@ -61,22 +68,16 @@ func (kc *K8sClient) ListPods(ctx context.Context, namespace string, labelSelect
 		return nil, err
 	}
 
-	mPods := map[string]v1.Pod{}
-
-	for _, item := range pods.Items {
-		mPods[item.Name] = item
-	}
-
-	return mPods, nil
+	return pods.Items, nil
 }
 
-func (kc *K8sClient) GetPodLogs(ctx context.Context, namespace string, pod v1.Pod, sinceTime time.Time) ([]LogLine, error) {
-	rc := kc.client.CoreV1().Pods(namespace).GetLogs(pod.Name, &v1.PodLogOptions{
+func (c KClient) GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) ([]LogLine, error) {
+	rc := c.ClientSet.CoreV1().Pods(namespace).GetLogs(pod.Name, &v1.PodLogOptions{
 		SinceTime: &metav1.Time{
 			Time: sinceTime,
 		},
 	})
-	stream, err := rc.Stream(ctx)
+	stream, err := rc.Stream(c.Ctx)
 
 	if err != nil {
 		return nil, err
