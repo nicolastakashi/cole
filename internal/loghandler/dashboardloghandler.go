@@ -26,7 +26,7 @@ var dashboardLastView = promauto.NewGaugeVec(
 		Name:      "dashboard_last_view_seconds",
 		Help:      "dashboard last view in seconds",
 	},
-	[]string{"dashboard_uid", "org_id", "user_id", "user_name"},
+	[]string{"dashboard_uid", "org_id"},
 )
 
 type DashboardLogHandler struct {
@@ -43,6 +43,6 @@ func (dlh *DashboardLogHandler) Handle(ll k8sclient.LogLine) {
 
 	if ll.KeyValue["status"] == "200" {
 		dashboardViewTotal.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).Inc()
-		dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).SetToCurrentTime()
+		dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId).SetToCurrentTime()
 	}
 }

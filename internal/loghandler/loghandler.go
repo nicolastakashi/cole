@@ -2,16 +2,16 @@ package loghandler
 
 import "github.com/nicolastakashi/cole/internal/k8sclient"
 
-func New() LogHandler {
+func New() *LogHandler {
 	dlh := DashboardLogHandler{}
 
-	return LogHandler{
+	return &LogHandler{
 		next: &dlh,
 	}
 }
 
 type LogHandler struct {
-	next handler
+	next Handler
 }
 
 func (lh *LogHandler) Handle(ll k8sclient.LogLine) {
