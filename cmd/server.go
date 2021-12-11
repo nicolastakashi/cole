@@ -82,7 +82,7 @@ to quickly create a Cobra application.`,
 		})
 
 		wg.Go(func() error {
-			client, err := k8sclient.NewTwo(ctx, scmd.KubeConfig)
+			client, err := k8sclient.New(ctx, scmd.KubeConfig)
 
 			if err != nil {
 				return err

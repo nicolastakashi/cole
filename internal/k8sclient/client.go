@@ -22,7 +22,7 @@ type KClient struct {
 	Ctx       context.Context
 }
 
-func NewTwo(ctx context.Context, kubeConfig string) (*KClient, error) {
+func New(ctx context.Context, kubeConfig string) (*KClient, error) {
 	var config *rest.Config = nil
 	var err error = nil
 
