@@ -107,7 +107,7 @@ func TestGetPodLogsSuccess(t *testing.T) {
 		ClientSet: clientSet,
 	}
 
-	logs, _ := client.GetPodLogs("grafana", pod, time.Now())
+	_, err := client.GetPodLogs("grafana", pod, time.Now())
 
-	assert.Equal(t, 1, len(logs))
+	assert.Nil(t, err)
 }
