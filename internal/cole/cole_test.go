@@ -8,6 +8,7 @@ import (
 
 	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
+	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/loghandler"
 	"github.com/stretchr/testify/assert"
@@ -91,6 +92,6 @@ type FakeLogHandler struct {
 	Called bool
 }
 
-func (flh *FakeLogHandler) Handle(ll k8sclient.LogLine) {
+func (flh *FakeLogHandler) Handle(ll entities.LogLine) {
 	flh.Called = true
 }

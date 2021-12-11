@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/nicolastakashi/cole/internal/command"
+	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
+	"github.com/nicolastakashi/cole/internal/k8sclient/logging_parse"
 	"github.com/nicolastakashi/cole/internal/loghandler"
 	"github.com/sirupsen/logrus"
 )
@@ -51,14 +53,29 @@ func (c *Cole) run() error {
 		return err
 	}
 
-	logs := []k8sclient.LogLine{}
+	logs := []entities.LogLine{}
 
 	for _, pod := range pods {
-		lgs, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, c.LastSinceTime)
+		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, c.LastSinceTime)
 		if err != nil {
 			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
 			return err
 		}
+
+		stream, err := lr.Stream(c.Ctx)
+
+		if err != nil {
+			return err
+		}
+
+		defer stream.Close()
+
+		lgs, err := logging_parse.Get(c.Scmd.LogType).Parse(stream)
+
+		if err != nil {
+			return err
+		}
+
 		logs = append(logs, lgs...)
 	}
 

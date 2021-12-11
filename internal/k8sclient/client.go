@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-logfmt/logfmt"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,17 +14,12 @@ import (
 
 type Client interface {
 	ListPods(namespace string, labelSelector string) ([]v1.Pod, error)
-	GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) ([]LogLine, error)
+	GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error)
 }
 
 type KClient struct {
 	ClientSet kubernetes.Interface
 	Ctx       context.Context
-}
-
-type LogLine struct {
-	LineNumber int
-	KeyValue   map[string]string
 }
 
 func NewTwo(ctx context.Context, kubeConfig string) (*KClient, error) {
@@ -71,40 +65,24 @@ func (c KClient) ListPods(namespace string, labelSelector string) ([]v1.Pod, err
 	return pods.Items, nil
 }
 
-func (c KClient) GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) ([]LogLine, error) {
+func (c KClient) GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error) {
 	rc := c.ClientSet.CoreV1().Pods(namespace).GetLogs(pod.Name, &v1.PodLogOptions{
 		SinceTime: &metav1.Time{
 			Time: sinceTime,
 		},
 	})
-	stream, err := rc.Stream(c.Ctx)
 
-	if err != nil {
-		return nil, err
-	}
+	// stream, err := rc.Stream(c.Ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	defer stream.Close()
+	// defer stream.Close()
 
-	d := logfmt.NewDecoder(stream)
-	loglines := []LogLine{}
-	logLineNumber := 1
+	// loglines, err := logging_parse.Get("").Parse(stream)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	for d.ScanRecord() {
-		logLine := LogLine{
-			LineNumber: logLineNumber,
-			KeyValue:   make(map[string]string),
-		}
-
-		for d.ScanKeyval() {
-			logLine.KeyValue[string(d.Key())] = string(d.Value())
-		}
-
-		if len(logLine.KeyValue) == 0 {
-			continue
-		}
-
-		loglines = append(loglines, logLine)
-		logLineNumber++
-	}
-	return loglines, nil
+	return rc, nil
 }

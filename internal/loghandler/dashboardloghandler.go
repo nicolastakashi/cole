@@ -4,7 +4,6 @@ import (
 	"regexp"
 
 	"github.com/nicolastakashi/cole/internal/entities"
-	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -32,7 +31,7 @@ var dashboardLastView = promauto.NewGaugeVec(
 type DashboardLogHandler struct {
 }
 
-func (dlh *DashboardLogHandler) Handle(ll k8sclient.LogLine) {
+func (dlh *DashboardLogHandler) Handle(ll entities.LogLine) {
 	path := ll.KeyValue["path"]
 
 	if !regexDashboardPath.MatchString(path) {

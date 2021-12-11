@@ -1,7 +1,9 @@
 package loghandler
 
-import "github.com/nicolastakashi/cole/internal/k8sclient"
+import (
+	"github.com/nicolastakashi/cole/internal/entities"
+)
 
 type Handler interface {
-	Handle(ll k8sclient.LogLine)
+	Handle(ll entities.LogLine)
 }

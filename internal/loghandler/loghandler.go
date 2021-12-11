@@ -1,6 +1,8 @@
 package loghandler
 
-import "github.com/nicolastakashi/cole/internal/k8sclient"
+import (
+	"github.com/nicolastakashi/cole/internal/entities"
+)
 
 func New() *LogHandler {
 	dlh := DashboardLogHandler{}
@@ -14,7 +16,7 @@ type LogHandler struct {
 	next Handler
 }
 
-func (lh *LogHandler) Handle(ll k8sclient.LogLine) {
+func (lh *LogHandler) Handle(ll entities.LogLine) {
 	// filter only http logs
 	if _, ok := ll.KeyValue["status"]; !ok {
 		return

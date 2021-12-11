@@ -2,8 +2,6 @@ package entities
 
 import (
 	"strings"
-
-	"github.com/nicolastakashi/cole/internal/k8sclient"
 )
 
 type DashBoardLog struct {
@@ -13,7 +11,7 @@ type DashBoardLog struct {
 	UserName     string
 }
 
-func NewDashboardLog(ll k8sclient.LogLine) DashBoardLog {
+func NewDashboardLog(ll LogLine) DashBoardLog {
 	path := ll.KeyValue["path"]
 	orgId := ll.KeyValue["orgId"]
 	duid := "unknow"
