@@ -10,20 +10,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Start(ctx context.Context, scmd command.Server) error {
-	client, err := k8sclient.New(scmd.KubeConfig)
+type Cole struct {
+	Ctx           context.Context
+	Scmd          command.Server
+	Client        k8sclient.Client
+	LastSinceTime time.Time
+	LogHandler    loghandler.Handler
+	Timer         *time.Timer
+	Out           chan bool
+}
 
-	if err != nil {
-		return err
-	}
-	t := time.NewTimer(1 * time.Millisecond)
-	lastSinceTime := time.Now().Add(time.Duration(-24) * time.Hour)
-	logHandler := loghandler.New()
-
+func (cole Cole) Start() error {
 	for {
 		select {
-		case <-t.C:
-			if err := start(ctx, scmd, client, &lastSinceTime, logHandler); err != nil {
+		case <-cole.Timer.C:
+			if err := cole.run(); err != nil {
 				// syncErrorTotal.Inc()
 				return err
 			} else {
@@ -31,36 +32,40 @@ func Start(ctx context.Context, scmd command.Server) error {
 				// syncSuccessTotal.Inc()
 				// lastSuccessfulSync.SetToCurrentTime()
 			}
-			t.Reset(30 * time.Second)
-		case <-ctx.Done():
+			cole.Timer.Reset(30 * time.Second)
+			if cole.Out != nil {
+				cole.Out <- true
+			}
+		case <-cole.Ctx.Done():
 			logrus.Info("shut down cole")
 			return nil
 		}
 	}
 }
 
-func start(ctx context.Context, scmd command.Server, client *k8sclient.K8sClient, lastSinceTime *time.Time, lh loghandler.LogHandler) error {
-	pods, err := client.ListPods(ctx, scmd.Namespace, scmd.LabelSelector)
+func (c *Cole) run() error {
+	pods, err := c.Client.ListPods(c.Scmd.Namespace, c.Scmd.LabelSelector)
 
 	if err != nil {
-		logrus.Errorf("error to lost pods ", err)
+		logrus.Errorf("error to lost pods %v", err)
 		return err
 	}
 
 	logs := []k8sclient.LogLine{}
 
 	for _, pod := range pods {
-		lgs, err := client.GetPodLogs(ctx, scmd.Namespace, pod, *lastSinceTime)
+		lgs, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, c.LastSinceTime)
 		if err != nil {
-			logrus.Errorf("error to get pod %v logs ", pod.Name, err)
+			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
 			return err
 		}
 		logs = append(logs, lgs...)
 	}
 
-	*lastSinceTime = time.Now()
+	c.LastSinceTime = time.Now()
+
 	for _, log := range logs {
-		lh.Handle(log)
+		c.LogHandler.Handle(log)
 	}
 
 	return nil
