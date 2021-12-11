@@ -23,10 +23,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
+	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/logging"
+	"github.com/nicolastakashi/cole/internal/loghandler"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/version"
@@ -72,14 +75,29 @@ to quickly create a Cobra application.`,
 
 		wg.Go(func() error {
 			if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-				logrus.Error("msg", "http server error", err, err)
+				logrus.Errorf("msg", "http server error", err, err)
 				return err
 			}
 			return nil
 		})
 
 		wg.Go(func() error {
-			if err := cole.Start(ctx, *scmd); err != nil {
+			client, err := k8sclient.NewTwo(ctx, scmd.KubeConfig)
+
+			if err != nil {
+				return err
+			}
+
+			cole := cole.Cole{
+				Ctx:           ctx,
+				Scmd:          *scmd,
+				Client:        client,
+				LogHandler:    loghandler.New(),
+				LastSinceTime: time.Now().Add(time.Duration(-24) * time.Hour),
+				Timer:         time.NewTimer(1 * time.Millisecond),
+			}
+
+			if err := cole.Start(); err != nil {
 				return err
 			}
 			return nil
@@ -92,13 +110,13 @@ to quickly create a Cobra application.`,
 		}
 
 		if err := srv.Shutdown(ctx); err != nil {
-			logrus.Error("server shutdown error ", err)
+			logrus.Errorf("server shutdown error ", err)
 		}
 
 		cancel()
 
 		if err := wg.Wait(); err != nil {
-			logrus.Error("unhandled error received. Exiting...", err)
+			logrus.Errorf("unhandled error received. Exiting...", err)
 			os.Exit(1)
 		}
 
