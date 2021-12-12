@@ -16,13 +16,18 @@ type Cole struct {
 	Ctx           context.Context
 	Scmd          command.Server
 	Client        k8sclient.Client
-	LastSinceTime time.Time
+	LastSinceTime *time.Time
 	LogHandler    loghandler.Handler
 	Timer         *time.Timer
 	Out           chan bool
 }
 
-func (cole Cole) Start() error {
+func (c *Cole) UpdateLastSinceTime() {
+	lastSinceTime := time.Now()
+	c.LastSinceTime = &lastSinceTime
+}
+
+func (cole *Cole) Start() error {
 	for {
 		select {
 		case <-cole.Timer.C:
@@ -56,7 +61,7 @@ func (c *Cole) run() error {
 	logs := []entities.LogLine{}
 
 	for _, pod := range pods {
-		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, c.LastSinceTime)
+		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, *c.LastSinceTime)
 		if err != nil {
 			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
 			return err
@@ -79,7 +84,7 @@ func (c *Cole) run() error {
 		logs = append(logs, lgs...)
 	}
 
-	c.LastSinceTime = time.Now()
+	c.UpdateLastSinceTime()
 
 	for _, log := range logs {
 		c.LogHandler.Handle(log)

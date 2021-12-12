@@ -22,13 +22,14 @@ import (
 
 func buildCole(clientSet kubernetes.Interface) *cole.Cole {
 	ctx := context.TODO()
+	lastSinceTime := time.Now()
 	return &cole.Cole{
 		Ctx: ctx,
 		Scmd: command.Server{
 			Namespace:     "grafana",
 			LabelSelector: "name=grafana",
 		},
-		LastSinceTime: time.Now(),
+		LastSinceTime: &lastSinceTime,
 		LogHandler:    loghandler.New(),
 		Timer:         time.NewTimer(1 * time.Millisecond),
 		Client: k8sclient.KClient{
@@ -51,6 +52,37 @@ func TestStartHandleListPodError(t *testing.T) {
 	err := cole.Start()
 
 	assert.NotNil(t, err)
+}
+
+func TestEnsureUpdateLastSinceTime(t *testing.T) {
+	podList := &v1.PodList{
+		Items: []v1.Pod{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "grafana",
+					Namespace: "grafana",
+					Labels: map[string]string{
+						"name": "grafana",
+					},
+				},
+			},
+		},
+	}
+	clientSet := testclient.NewSimpleClientset(podList)
+
+	clientSet.PrependReactor("list", "pods", func(clienttesting.Action) (handled bool, ret runtime.Object, err error) {
+		return true, podList, nil
+	})
+
+	cole := buildCole(clientSet)
+	lastSinceTime := cole.LastSinceTime
+
+	go cole.Start()
+
+	<-cole.Out
+	cole.Ctx.Done()
+
+	assert.True(t, cole.LastSinceTime.After(*lastSinceTime))
 }
 
 func TestEnsureLogHandlerIsCalled(t *testing.T) {
