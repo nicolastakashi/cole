@@ -2,10 +2,13 @@ package loghandler
 
 import (
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/nicolastakashi/cole/internal/metrics"
 )
 
 func New() *LogHandler {
-	dlh := DashboardLogHandler{}
+	dlh := DashboardLogHandler{
+		DashboardMetrics: metrics.DashboardMetrics{},
+	}
 
 	return &LogHandler{
 		next: &dlh,
