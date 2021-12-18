@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -12,8 +13,8 @@ type DashBoardLog struct {
 }
 
 func NewDashboardLog(ll LogLine) DashBoardLog {
-	path := ll.KeyValue["path"]
-	orgId := ll.KeyValue["orgId"]
+	path := fmt.Sprintf("%v", ll.KeyValue["path"])
+	orgId := fmt.Sprintf("%v", ll.KeyValue["orgId"])
 	duid := "unknow"
 	uid := "unknow"
 	uname := "unknow"
@@ -23,11 +24,11 @@ func NewDashboardLog(ll LogLine) DashBoardLog {
 	}
 
 	if value, ok := ll.KeyValue["uname"]; ok {
-		uname = value
+		uname = fmt.Sprintf("%v", value)
 	}
 
 	if value, ok := ll.KeyValue["userId"]; ok {
-		uid = value
+		uid = fmt.Sprintf("%v", value)
 	}
 
 	return DashBoardLog{
