@@ -20,3 +20,12 @@ LDFLAGS=-w -extldflags "-static" \
 
 build:
 	$(ENVVARS) $(GOCMD) build -ldflags '$(LDFLAGS)' -o $(BINARY_FOLDER)/$(BINARY_NAME) -v $(GOMAIN)
+
+deps:
+	$(ENVVARS) $(GOCMD) mod download
+
+fmt:
+	$(ENVVARS) $(GOCMD) fmt -x ./...
+
+vet:
+	$(ENVVARS) $(GOCMD) vet ./...
