@@ -75,7 +75,7 @@ to quickly create a Cobra application.`,
 
 		wg.Go(func() error {
 			if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-				logrus.Errorf("msg", "http server error", err, err)
+				logrus.Errorf("http server error %v", err)
 				return err
 			}
 			return nil
@@ -112,13 +112,13 @@ to quickly create a Cobra application.`,
 		}
 
 		if err := srv.Shutdown(ctx); err != nil {
-			logrus.Errorf("server shutdown error ", err)
+			logrus.Errorf("server shutdown error %v", err)
 		}
 
 		cancel()
 
 		if err := wg.Wait(); err != nil {
-			logrus.Errorf("unhandled error received. Exiting...", err)
+			logrus.Errorf("unhandled error received. Exiting... %v", err)
 			os.Exit(1)
 		}
 
