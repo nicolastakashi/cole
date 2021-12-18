@@ -1,6 +1,7 @@
 package loghandler
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/nicolastakashi/cole/internal/entities"
@@ -16,11 +17,11 @@ type DashboardLogHandler struct {
 func (dlh *DashboardLogHandler) Handle(logLine entities.LogLine) {
 	path := logLine.KeyValue["path"]
 
-	if !regexDashboardPath.MatchString(path) {
+	if !regexDashboardPath.MatchString(fmt.Sprintf("%v", path)) {
 		return
 	}
 
-	if logLine.KeyValue["status"] == "200" {
+	if status := logLine.KeyValue["status"]; fmt.Sprintf("%v", status) == "200" {
 		dlh.DashboardMetrics.Collect(logLine)
 	}
 }

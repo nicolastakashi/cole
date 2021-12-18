@@ -27,7 +27,7 @@ func TestDoNotHandleLogWithoutPath(t *testing.T) {
 
 	dlh.Handle(entities.LogLine{
 		LineNumber: 1,
-		KeyValue: map[string]string{
+		KeyValue: map[string]interface{}{
 			"cenas": "xablau",
 		},
 	})
@@ -46,7 +46,7 @@ func TestDoNotHandleLogThatPathDoesNotMatch(t *testing.T) {
 
 	dlh.Handle(entities.LogLine{
 		LineNumber: 1,
-		KeyValue: map[string]string{
+		KeyValue: map[string]interface{}{
 			"path": "/bananas",
 		},
 	})
@@ -65,7 +65,7 @@ func TestDoNotCollectMetricFromLogThatIsNot200(t *testing.T) {
 
 	dlh.Handle(entities.LogLine{
 		LineNumber: 1,
-		KeyValue: map[string]string{
+		KeyValue: map[string]interface{}{
 			"path":   "/api/dashboards/uid/dashboard_uid",
 			"status": "500",
 		},
@@ -85,7 +85,7 @@ func TestCollectMetrics(t *testing.T) {
 
 	dlh.Handle(entities.LogLine{
 		LineNumber: 1,
-		KeyValue: map[string]string{
+		KeyValue: map[string]interface{}{
 			"path":   "/api/dashboards/uid/dashboard_uid",
 			"status": "200",
 		},

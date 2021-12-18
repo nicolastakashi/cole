@@ -18,7 +18,7 @@ func (JsonLoggingParse) Parse(stream io.ReadCloser) ([]entities.LogLine, error) 
 	for in := bufio.NewScanner(stream); in.Scan(); {
 		logLine := entities.LogLine{
 			LineNumber: logLineNumber,
-			KeyValue:   make(map[string]string),
+			KeyValue:   make(map[string]interface{}),
 		}
 		json.Unmarshal(in.Bytes(), &logLine.KeyValue)
 

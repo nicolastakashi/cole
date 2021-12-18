@@ -18,7 +18,7 @@ func (ConsoleLoggingParse) Parse(stream io.ReadCloser) ([]entities.LogLine, erro
 	for d.ScanRecord() {
 		logLine := entities.LogLine{
 			LineNumber: logLineNumber,
-			KeyValue:   make(map[string]string),
+			KeyValue:   make(map[string]interface{}),
 		}
 
 		for d.ScanKeyval() {
