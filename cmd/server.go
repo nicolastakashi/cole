@@ -88,8 +88,7 @@ to quickly create a Cobra application.`,
 				return err
 			}
 
-			lastSinceTime := time.Now().Add(time.Duration(-24) * time.Hour)
-
+			lastSinceTime := time.Now()
 			cole := cole.Cole{
 				Ctx:           ctx,
 				Scmd:          *scmd,
