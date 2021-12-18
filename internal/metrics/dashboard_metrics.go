@@ -4,6 +4,7 @@ import (
 	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/sirupsen/logrus"
 )
 
 var dashboardViewTotal = promauto.NewCounterVec(
@@ -35,4 +36,6 @@ func (DashboardMetrics) Collect(logLine entities.LogLine) {
 
 	dashboardViewTotal.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).Inc()
 	dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId).SetToCurrentTime()
+
+	logrus.Info("collecting dashboard metrics")
 }

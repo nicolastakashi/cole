@@ -27,6 +27,7 @@ type Cole struct {
 func (c *Cole) UpdateLastSinceTime() {
 	lastSinceTime := time.Now()
 	c.LastSinceTime = &lastSinceTime
+	logrus.Info("updating last sinc time %v", c.LastSinceTime)
 }
 
 var lastSuccessfulSync = promauto.NewGauge(prometheus.GaugeOpts{
@@ -59,7 +60,7 @@ func (cole *Cole) Start() error {
 				syncErrorTotal.Inc()
 				return err
 			} else {
-				logrus.Info("done")
+				logrus.Info("sixth sense updated")
 				syncSuccessTotal.Inc()
 				lastSuccessfulSync.SetToCurrentTime()
 			}
@@ -68,7 +69,7 @@ func (cole *Cole) Start() error {
 				cole.Out <- true
 			}
 		case <-cole.Ctx.Done():
-			logrus.Info("shut down cole")
+			logrus.Info("cole, please stop...")
 			return nil
 		}
 	}
@@ -113,6 +114,8 @@ func (c *Cole) run() error {
 	for _, log := range logs {
 		c.LogHandler.Handle(log)
 	}
+
+	logrus.Debug("i'm ready to tell you my secret now.")
 
 	return nil
 }
