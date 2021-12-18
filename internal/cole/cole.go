@@ -99,7 +99,7 @@ func (c *Cole) run() error {
 
 		defer stream.Close()
 
-		lgs, err := logging_parse.Get(c.Scmd.LogType).Parse(stream)
+		lgs, err := logging_parse.Get(c.Scmd.LogFormat).Parse(stream)
 
 		if err != nil {
 			return err

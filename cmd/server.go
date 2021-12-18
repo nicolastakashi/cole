@@ -135,6 +135,7 @@ func init() {
 	serverCmd.Flags().StringVar(&scmd.KubeConfig, "kubeconfig", "", "(optional) absolute path to the kubeconfig file")
 	serverCmd.Flags().StringVar(&scmd.Namespace, "namespace", "default", "namespace that will store the dashboard config map")
 	serverCmd.Flags().StringVar(&scmd.LabelSelector, "labelselector", "", "Grafana pod label selector")
+	serverCmd.Flags().StringVar(&scmd.LogFormat, "grafana.log.format", "", "Grafana pod label selector")
 	rootCmd.AddCommand(serverCmd)
 }
 

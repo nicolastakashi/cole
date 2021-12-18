@@ -5,5 +5,5 @@ type Server struct {
 	KubeConfig    string
 	Namespace     string
 	LabelSelector string
-	LogType       string
+	LogFormat     string
 }
