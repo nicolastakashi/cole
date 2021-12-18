@@ -9,6 +9,8 @@ import (
 	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/k8sclient/logging_parse"
 	"github.com/nicolastakashi/cole/internal/loghandler"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,17 +29,39 @@ func (c *Cole) UpdateLastSinceTime() {
 	c.LastSinceTime = &lastSinceTime
 }
 
+var lastSuccessfulSync = promauto.NewGauge(prometheus.GaugeOpts{
+	Namespace: "cole",
+	Name:      "last_success_sync_timestamp_seconds",
+	Help:      "Unix timestamp of the last successful dashboard sync in seconds",
+})
+
+var syncSuccessTotal = promauto.NewCounter(
+	prometheus.CounterOpts{
+		Namespace: "cole",
+		Name:      "sync_total_success",
+		Help:      "Total number of successful sync operations",
+	},
+)
+
+var syncErrorTotal = promauto.NewCounter(
+	prometheus.CounterOpts{
+		Namespace: "cole",
+		Name:      "sync_total_error",
+		Help:      "Total number of sync operations with errors",
+	},
+)
+
 func (cole *Cole) Start() error {
 	for {
 		select {
 		case <-cole.Timer.C:
 			if err := cole.run(); err != nil {
-				// syncErrorTotal.Inc()
+				syncErrorTotal.Inc()
 				return err
 			} else {
 				logrus.Info("done")
-				// syncSuccessTotal.Inc()
-				// lastSuccessfulSync.SetToCurrentTime()
+				syncSuccessTotal.Inc()
+				lastSuccessfulSync.SetToCurrentTime()
 			}
 			cole.Timer.Reset(30 * time.Second)
 			if cole.Out != nil {
