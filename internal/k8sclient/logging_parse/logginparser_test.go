@@ -32,3 +32,20 @@ func TestConsoleParseLogging(t *testing.T) {
 	assert.Equal(t, len(logLines), 2)
 
 }
+
+func TestJsonParseLogging(t *testing.T) {
+	in := `
+	✔ Downloaded marcusolsson-json-datasource v1.3.0 zip successfully
+
+	Please restart Grafana after installing plugins. Refer to Grafana documentation for instructions if necessary.
+
+	{"logger":"settings","lvl":"warn","msg":"falling back to legacy setting of 'min_interval_seconds'; please use the configuration option in the unified_alerting section if Grafana 8 alerts are enabled.","t":"2021-12-18T09:20:12.278092279Z"}
+	{"logger":"settings","lvl":"warn","msg":"falling back to legacy setting of 'min_interval_seconds'; please use the configuration option in the unified_alerting section if Grafana 8 alerts are enabled.","t":"2021-12-18T09:20:12.278262959Z"}
+	{"file":"/usr/share/grafana/conf/defaults.ini","logger":"settings","lvl":"info","msg":"Config loaded from","t":"2021-12-18T09:20:12.278352264Z"}
+	`
+	reader := io.NopCloser(strings.NewReader(in))
+
+	logLines, _ := logging_parse.Get("json").Parse(reader)
+
+	assert.Equal(t, len(logLines), 3)
+}
