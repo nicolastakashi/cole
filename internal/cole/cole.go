@@ -27,7 +27,7 @@ type Cole struct {
 func (c *Cole) UpdateLastSinceTime() {
 	lastSinceTime := time.Now()
 	c.LastSinceTime = &lastSinceTime
-	logrus.Info("updating last sinc time %v", c.LastSinceTime)
+	logrus.Infof("updating last sinc time %v", c.LastSinceTime)
 }
 
 var lastSuccessfulSync = promauto.NewGauge(prometheus.GaugeOpts{
