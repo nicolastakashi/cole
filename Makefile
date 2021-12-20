@@ -18,6 +18,12 @@ LDFLAGS=-w -extldflags "-static" \
 		-X github.com/prometheus/common/version.BuildUser=$(shell whoami) \
 		-X "github.com/prometheus/common/version.BuildDate=$(shell date -u)"
 
+docker-build:
+	@DOCKER_BUILDKIT=1 docker build -t ${ARTIFACT_NAME}:${RELEASE_VERSION} -f ./build/package/Dockerfile --progress=plain .
+
+docker-push:
+	@DOCKER_BUILDKIT=1 docker push $(ARTIFACT_NAME):${RELEASE_VERSION}
+
 build:
 	$(ENVVARS) $(GOCMD) build -ldflags '$(LDFLAGS)' -o $(BINARY_FOLDER)/$(BINARY_NAME) -v $(GOMAIN)
 
@@ -29,3 +35,5 @@ fmt:
 
 vet:
 	$(ENVVARS) $(GOCMD) vet ./...
+
+all: build fmt vet deps
