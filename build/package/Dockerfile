@@ -11,9 +11,6 @@ COPY --chown=cole:cole . .
 
 RUN make all
 
-RUN pwd
-RUN ls -la /go/src/github.com/nicolastakashi/cole
-
 FROM golang:latest as runtime
 
 RUN useradd -ms /bin/bash cole
