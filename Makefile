@@ -36,6 +36,9 @@ fmt:
 vet:
 	$(ENVVARS) $(GOCMD) vet ./...
 
-all: build fmt vet deps
+tests:
+	$(ENVVARS) $(GOCMD) test ./...
+
+all: fmt vet tests deps build
 
 .PHONY: build
