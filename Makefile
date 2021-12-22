@@ -37,3 +37,5 @@ vet:
 	$(ENVVARS) $(GOCMD) vet ./...
 
 all: build fmt vet deps
+
+.PHONY: build
