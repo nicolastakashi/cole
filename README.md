@@ -1,5 +1,10 @@
 # Cole
-Cole can use his sixth sense to tell secrets about your dashboards usage.
+
+Cole is a lightweight service that handles HTTP logs of Grafana to provide insights about the usage of Grafana instances and expose it through Prometheus metrics.
+
+# Metrics Documentation
+
+See the [docs](./docs/README.md) directory for more information on the exposed metrics.
 
 # Contributing
 Contributions are very welcome! See our [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
