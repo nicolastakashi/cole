@@ -133,9 +133,9 @@ func init() {
 	serverCmd.Flags().StringVar(&serverPort, "http.port", ":9754", "listem port for http endpoints")
 	serverCmd.Flags().StringVar(&scmd.LogLevel, "log.level", logrus.InfoLevel.String(), "listem port for http endpoints")
 	serverCmd.Flags().StringVar(&scmd.KubeConfig, "kubeconfig", "", "(optional) absolute path to the kubeconfig file")
-	serverCmd.Flags().StringVar(&scmd.Namespace, "namespace", "default", "namespace that will store the dashboard config map")
-	serverCmd.Flags().StringVar(&scmd.LabelSelector, "labelselector", "", "Grafana pod label selector")
-	serverCmd.Flags().BoolVar(&scmd.IncludeUname, "metrics.include.uname", false, "Include user name to metrics disabled by default")
+	serverCmd.Flags().StringVar(&scmd.Namespace, "namespace", "default", "namespace where Grafana is running")
+	serverCmd.Flags().BoolVar(&scmd.IncludeUname, "metrics.includeUname", false, "Include user name to metrics (disabled by default)")
+	serverCmd.Flags().StringVar(&scmd.LabelSelector, "grafana.podLabelselector", "", "Grafana pod label selector")
 	serverCmd.Flags().StringVar(&scmd.LogFormat, "grafana.log.format", "", "Grafana pod log format")
 	rootCmd.AddCommand(serverCmd)
 }
