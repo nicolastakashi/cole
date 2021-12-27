@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -29,10 +30,13 @@ type MetricCollector interface {
 	Collect(logLine entities.LogLine)
 }
 
-type DashboardMetrics struct{}
+type DashboardMetrics struct {
+	Scmd command.Server
+}
 
-func (DashboardMetrics) Collect(logLine entities.LogLine) {
-	dl := entities.NewDashboardLog(logLine)
+func (dm DashboardMetrics) Collect(logLine entities.LogLine) {
+
+	dl := entities.NewDashboardLog(logLine, dm.Scmd.IncludeUname)
 
 	dashboardViewTotal.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).Inc()
 	dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId).SetToCurrentTime()

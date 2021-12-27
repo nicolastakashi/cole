@@ -1,14 +1,17 @@
 package loghandler
 
 import (
+	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/entities"
 	"github.com/nicolastakashi/cole/internal/metrics"
 	"github.com/sirupsen/logrus"
 )
 
-func New() *LogHandler {
+func New(scmd command.Server) *LogHandler {
 	dlh := DashboardLogHandler{
-		DashboardMetrics: metrics.DashboardMetrics{},
+		DashboardMetrics: metrics.DashboardMetrics{
+			Scmd: scmd,
+		},
 	}
 
 	return &LogHandler{

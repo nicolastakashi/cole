@@ -12,7 +12,7 @@ type DashBoardLog struct {
 	UserName     string
 }
 
-func NewDashboardLog(ll LogLine) DashBoardLog {
+func NewDashboardLog(ll LogLine, includeUname bool) DashBoardLog {
 	path := fmt.Sprintf("%v", ll.KeyValue["path"])
 	orgId := fmt.Sprintf("%v", ll.KeyValue["orgId"])
 	duid := "unknow"
@@ -23,7 +23,7 @@ func NewDashboardLog(ll LogLine) DashBoardLog {
 		duid = splitedPath[4]
 	}
 
-	if value, ok := ll.KeyValue["uname"]; ok {
+	if value, ok := ll.KeyValue["uname"]; ok && includeUname {
 		uname = fmt.Sprintf("%v", value)
 	}
 

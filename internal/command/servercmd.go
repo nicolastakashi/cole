@@ -6,4 +6,5 @@ type Server struct {
 	Namespace     string
 	LabelSelector string
 	LogFormat     string
+	IncludeUname  bool
 }

@@ -23,14 +23,15 @@ import (
 func buildCole(clientSet kubernetes.Interface) *cole.Cole {
 	ctx := context.TODO()
 	lastSinceTime := time.Now()
+	scmd := command.Server{
+		Namespace:     "grafana",
+		LabelSelector: "name=grafana",
+	}
 	return &cole.Cole{
-		Ctx: ctx,
-		Scmd: command.Server{
-			Namespace:     "grafana",
-			LabelSelector: "name=grafana",
-		},
+		Ctx:           ctx,
+		Scmd:          scmd,
 		LastSinceTime: &lastSinceTime,
-		LogHandler:    loghandler.New(),
+		LogHandler:    loghandler.New(scmd),
 		Timer:         time.NewTimer(1 * time.Millisecond),
 		Client: k8sclient.KClient{
 			ClientSet: clientSet,
