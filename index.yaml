@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  cole:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2021-12-27T19:06:07.427513448Z"
+    description: A Helm chart for Cole
+    digest: a0bd5155cab95c6079bc8ab1618efc5b4ae37e95af8ee2f4267b3ab60f6ee866
+    name: cole
+    type: application
+    urls:
+    - https://github.com/nicolastakashi/cole/releases/download/cole-1.0.0/cole-1.0.0.tgz
+    version: 1.0.0
+generated: "2021-12-27T19:06:07.427520048Z"
