@@ -22,12 +22,12 @@ To build the source code you can use the `make build`, which will compile in
 the assets so that Cole can be run from anywhere:
 
 ```bash
-    $ mkdir -p $GOPATH/src/github.com/nicolastakashi/cole
-    $ cd $GOPATH/src/github.com/nicolastakashi/cole
-    $ git clone https://github.com/nicolastakashi/cole.git
-    $ cd cole
-    $ make build
-    $ ./cole server <args>
+$ mkdir -p $GOPATH/src/github.com/nicolastakashi/cole
+$ cd $GOPATH/src/github.com/nicolastakashi/cole
+$ git clone https://github.com/nicolastakashi/cole.git
+$ cd cole
+$ make build
+$ ./cole server <args>
 ```
 
 The Makefile provides several targets:
