@@ -78,6 +78,7 @@ func (cole *Cole) Start() error {
 func (c *Cole) run() error {
 	pods, err := c.Client.ListPods(c.Scmd.Namespace, c.Scmd.LabelSelector)
 
+	logrus.Debugf("listed pods %v", len(pods))
 	if err != nil {
 		logrus.Errorf("error to list pods %v", err)
 		return err
