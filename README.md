@@ -1,3 +1,6 @@
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cole)](https://artifacthub.io/packages/search?repo=cole)
+[![Build](https://github.com/nicolastakashi/cole/actions/workflows/docker-publish.yml/badge.svg?event=branch_protection_rule)](https://github.com/nicolastakashi/cole/actions/workflows/docker-publish.yml)
+
 # Cole
 Cole can use his sixth sense to give you metrics about your Grafana dashboards
 
