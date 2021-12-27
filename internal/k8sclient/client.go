@@ -14,7 +14,7 @@ import (
 
 type Client interface {
 	ListPods(namespace string, labelSelector string) ([]v1.Pod, error)
-	GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error)
+	GetPodLogs(namespace string, container string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error)
 }
 
 type KClient struct {
@@ -65,24 +65,13 @@ func (c KClient) ListPods(namespace string, labelSelector string) ([]v1.Pod, err
 	return pods.Items, nil
 }
 
-func (c KClient) GetPodLogs(namespace string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error) {
+func (c KClient) GetPodLogs(namespace string, container string, pod v1.Pod, sinceTime time.Time) (*rest.Request, error) {
 	rc := c.ClientSet.CoreV1().Pods(namespace).GetLogs(pod.Name, &v1.PodLogOptions{
+		Container: container,
 		SinceTime: &metav1.Time{
 			Time: sinceTime,
 		},
 	})
-
-	// stream, err := rc.Stream(c.Ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// defer stream.Close()
-
-	// loglines, err := logging_parse.Get("").Parse(stream)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	return rc, nil
 }

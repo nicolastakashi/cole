@@ -86,7 +86,7 @@ func (c *Cole) run() error {
 	logs := []entities.LogLine{}
 
 	for _, pod := range pods {
-		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, pod, *c.LastSinceTime)
+		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, c.Scmd.Container, pod, *c.LastSinceTime)
 		if err != nil {
 			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
 			return err
@@ -95,6 +95,7 @@ func (c *Cole) run() error {
 		stream, err := lr.Stream(c.Ctx)
 
 		if err != nil {
+			logrus.Errorf("error to read logs %v", err)
 			return err
 		}
 

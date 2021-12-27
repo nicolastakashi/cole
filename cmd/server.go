@@ -136,6 +136,7 @@ func init() {
 	serverCmd.Flags().StringVar(&scmd.Namespace, "namespace", "default", "namespace where Grafana is running")
 	serverCmd.Flags().BoolVar(&scmd.IncludeUname, "metrics.includeUname", false, "Include user name to metrics (disabled by default)")
 	serverCmd.Flags().StringVar(&scmd.LabelSelector, "grafana.podLabelselector", "", "Grafana pod label selector")
+	serverCmd.Flags().StringVar(&scmd.Container, "grafana.containerName", "grafana", "Grafana container name (default grafana)")
 	serverCmd.Flags().StringVar(&scmd.LogFormat, "grafana.log.format", "", "Grafana pod log format")
 	rootCmd.AddCommand(serverCmd)
 }
