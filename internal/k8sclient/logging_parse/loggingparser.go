@@ -12,7 +12,7 @@ type LoggingParser interface {
 }
 
 func Get(lg string) LoggingParser {
-	logrus.Debug("getting log parser %v", lg)
+	logrus.Debugf("getting log parser %v", lg)
 	if lg == "json" {
 		return JsonLoggingParse{}
 	}

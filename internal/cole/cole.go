@@ -86,7 +86,7 @@ func (c *Cole) run() error {
 	logs := []entities.LogLine{}
 
 	for _, pod := range pods {
-		logrus.Debug("getting logs %v", pod.Name)
+		logrus.Debugf("getting logs %v", pod.Name)
 		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, c.Scmd.Container, pod, *c.LastSinceTime)
 		if err != nil {
 			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
@@ -109,7 +109,7 @@ func (c *Cole) run() error {
 		}
 
 		logs = append(logs, lgs...)
-		logrus.Debug("available logs %v", len(logs))
+		logrus.Debugf("available logs %v", len(logs))
 	}
 
 	c.UpdateLastSinceTime()
