@@ -1,12 +1,20 @@
 # Cole
+Cole can use his sixth sense to give you metrics about your Grafana dashboards
+
+## Overview
 
 Cole is a lightweight service that handles HTTP logs of Grafana to provide insights about the usage of Grafana instances and expose it through Prometheus metrics.
 
-# Metrics Documentation
+## Grafana router logging dependency
+Cole uses its sixth sense by Grafana HTTP logs, and because of this, you need to enable the `router_logging` to log all HTTP requests (not just errors).
+
+For more information about router logging, please, check the [Grafana official documentation](https://grafana.com/docs/grafana/latest/administration/configuration/#router_logging).
+
+## Metrics Documentation
 
 See the [docs](./docs/README.md) directory for more information on the exposed metrics.
 
-# Contributing
+## Contributing
 Contributions are very welcome! See our [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ## Docker images
