@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/sirupsen/logrus"
 )
 
 type LoggingParser interface {
@@ -11,6 +12,7 @@ type LoggingParser interface {
 }
 
 func Get(lg string) LoggingParser {
+	logrus.Debug("getting log parser %v", lg)
 	if lg == "json" {
 		return JsonLoggingParse{}
 	}

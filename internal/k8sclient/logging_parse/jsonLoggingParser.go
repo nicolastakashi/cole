@@ -6,12 +6,14 @@ import (
 	"io"
 
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/sirupsen/logrus"
 )
 
 type JsonLoggingParse struct {
 }
 
 func (JsonLoggingParse) Parse(stream io.ReadCloser) ([]entities.LogLine, error) {
+	logrus.Debug("parsin json logs")
 	logLineNumber := 1
 	loglines := []entities.LogLine{}
 

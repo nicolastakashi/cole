@@ -79,13 +79,14 @@ func (c *Cole) run() error {
 	pods, err := c.Client.ListPods(c.Scmd.Namespace, c.Scmd.LabelSelector)
 
 	if err != nil {
-		logrus.Errorf("error to lost pods %v", err)
+		logrus.Errorf("error to list pods %v", err)
 		return err
 	}
 
 	logs := []entities.LogLine{}
 
 	for _, pod := range pods {
+		logrus.Debug("getting logs %v", pod.Name)
 		lr, err := c.Client.GetPodLogs(c.Scmd.Namespace, c.Scmd.Container, pod, *c.LastSinceTime)
 		if err != nil {
 			logrus.Errorf("error to get pod %v logs %v", pod.Name, err)
@@ -108,6 +109,7 @@ func (c *Cole) run() error {
 		}
 
 		logs = append(logs, lgs...)
+		logrus.Debug("available logs %v", len(logs))
 	}
 
 	c.UpdateLastSinceTime()

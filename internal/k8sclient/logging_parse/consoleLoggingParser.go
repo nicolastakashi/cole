@@ -5,12 +5,14 @@ import (
 
 	"github.com/go-logfmt/logfmt"
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/sirupsen/logrus"
 )
 
 type ConsoleLoggingParse struct {
 }
 
 func (ConsoleLoggingParse) Parse(stream io.ReadCloser) ([]entities.LogLine, error) {
+	logrus.Debug("parsin console logs")
 	d := logfmt.NewDecoder(stream)
 	logLineNumber := 1
 	loglines := []entities.LogLine{}
