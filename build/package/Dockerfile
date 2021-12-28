@@ -11,14 +11,12 @@ COPY --chown=cole:cole . .
 
 RUN make all
 
-FROM golang:latest as runtime
-
-RUN useradd -ms /bin/bash cole
+FROM gcr.io/distroless/static:latest-amd64
 
 WORKDIR /cole
 
 COPY --from=build /go/src/github.com/nicolastakashi/cole/bin/* /bin/
 
-USER cole
+USER nobody
 
 ENTRYPOINT [ "/bin/cole" ]
