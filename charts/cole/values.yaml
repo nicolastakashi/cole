@@ -55,7 +55,7 @@ affinity: {}
 serviceMonitor:
 
   # if `true`, creates a Prometheus Operator ServiceMonitor
-  enabled: true
+  enabled: false
   
   # Interval at which metrics should be scraped.
   # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -71,9 +71,9 @@ grafanaApiSecret:
   annotations: {}
   data:
     ## Grafana DNS address
-    address: "http://grafana.grafana.svc.cluster.local:80/"
+    address: ""
     # Grafana ApiKey
-    apiKey: "eyJrIjoia3hpRTlrekhvd2l2dGJmSVd3alY1b2tuYVJVWE94VlAiLCJuIjoiY29sZSIsImlkIjoxfQ=="
+    apiKey: ""
 
 flags:
   # (optional) absolute path to the kubeconfig file
