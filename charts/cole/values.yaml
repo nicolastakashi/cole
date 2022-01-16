@@ -6,7 +6,7 @@ image:
   repository: ntakashi/cole
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.1.0"
+  tag: "1.2.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -55,7 +55,7 @@ affinity: {}
 serviceMonitor:
 
   # if `true`, creates a Prometheus Operator ServiceMonitor
-  enabled: false
+  enabled: true
   
   # Interval at which metrics should be scraped.
   # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -66,14 +66,14 @@ serviceMonitor:
   scrapeTimeout: ""
 
 grafanaApiSecret:
-  enabled: false
+  enabled: true
   labels: {}
   annotations: {}
   data:
     ## Grafana DNS address
-    address: ""
+    address: "http://grafana.grafana.svc.cluster.local:80/"
     # Grafana ApiKey
-    apiKey: ""
+    apiKey: "eyJrIjoia3hpRTlrekhvd2l2dGJmSVd3alY1b2tuYVJVWE94VlAiLCJuIjoiY29sZSIsImlkIjoxfQ=="
 
 flags:
   # (optional) absolute path to the kubeconfig file
