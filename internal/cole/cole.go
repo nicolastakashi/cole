@@ -6,9 +6,11 @@ import (
 
 	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/nicolastakashi/cole/internal/grafana"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/k8sclient/logging_parse"
 	"github.com/nicolastakashi/cole/internal/loghandler"
+	"github.com/nicolastakashi/cole/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
@@ -21,6 +23,7 @@ type Cole struct {
 	LastSinceTime *time.Time
 	LogHandler    loghandler.Handler
 	Timer         *time.Timer
+	GrafanaConfig grafana.GrafanaConfig
 	Out           chan bool
 }
 
@@ -55,6 +58,22 @@ var syncErrorTotal = promauto.NewCounter(
 func (cole *Cole) Start() error {
 	for {
 		select {
+		case <-cole.GrafanaConfig.GrafanaApiPoolTime.C:
+			if cole.Scmd.GrafanaApiConfigFile != "" {
+				logrus.Info("starting pool grafana api")
+				dashboardinfos, err := grafana.GetDashboardInfo(cole.GrafanaConfig)
+				if err != nil {
+					logrus.Error(err)
+				}
+
+				dm := metrics.DashboardMetrics{
+					Scmd: cole.Scmd,
+				}
+
+				dm.CollectFromGrafanaApi(dashboardinfos)
+				cole.GrafanaConfig.GrafanaApiPoolTime.Reset(60 * time.Second)
+			}
+
 		case <-cole.Timer.C:
 			if err := cole.run(); err != nil {
 				syncErrorTotal.Inc()

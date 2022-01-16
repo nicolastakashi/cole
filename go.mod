@@ -75,4 +75,8 @@ require (
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 )
 
-require github.com/pmezard/go-difflib v1.0.0 // indirect
+require (
+	github.com/grafana/grafana-api-golang-client v0.2.2 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+)

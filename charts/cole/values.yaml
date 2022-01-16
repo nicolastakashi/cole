@@ -6,7 +6,7 @@ image:
   repository: ntakashi/cole
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.1.0"
+  tag: "1.2.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -64,6 +64,16 @@ serviceMonitor:
   # Timeout after which the scrape is ended
   # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   scrapeTimeout: ""
+
+grafanaApiSecret:
+  enabled: true
+  labels: {}
+  annotations: {}
+  data:
+    ## Grafana DNS address
+    address: ""
+    # Grafana ApiKey
+    apiKey: ""
 
 flags:
   # (optional) absolute path to the kubeconfig file
