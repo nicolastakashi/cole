@@ -23,7 +23,7 @@ var dashboardLastView = promauto.NewGaugeVec(
 		Name:      "dashboard_last_view_seconds",
 		Help:      "dashboard last view in seconds",
 	},
-	[]string{"dashboard_uid", "org_id"},
+	[]string{"dashboard_uid", "org_id", "user_id"},
 )
 
 type MetricCollector interface {
@@ -39,7 +39,7 @@ func (dm DashboardMetrics) Collect(logLine entities.LogLine) {
 	dl := entities.NewDashboardLog(logLine, dm.Scmd.IncludeUname)
 
 	dashboardViewTotal.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId, dl.UserName).Inc()
-	dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId).SetToCurrentTime()
+	dashboardLastView.WithLabelValues(dl.DashboardUid, dl.OrgId, dl.UserId).SetToCurrentTime()
 
 	logrus.Info("collecting dashboard metrics")
 }
