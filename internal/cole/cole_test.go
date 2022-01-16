@@ -9,6 +9,7 @@ import (
 	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
 	"github.com/nicolastakashi/cole/internal/entities"
+	"github.com/nicolastakashi/cole/internal/grafana"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/loghandler"
 	"github.com/stretchr/testify/assert"
@@ -33,6 +34,9 @@ func buildCole(clientSet kubernetes.Interface) *cole.Cole {
 		LastSinceTime: &lastSinceTime,
 		LogHandler:    loghandler.New(scmd),
 		Timer:         time.NewTimer(1 * time.Millisecond),
+		GrafanaConfig: grafana.GrafanaConfig{
+			GrafanaApiPoolTime: time.NewTimer(1 * time.Millisecond),
+		},
 		Client: k8sclient.KClient{
 			ClientSet: clientSet,
 			Ctx:       ctx,

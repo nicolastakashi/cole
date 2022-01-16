@@ -38,6 +38,9 @@ spec:
             - --grafana.log.format={{ .Values.flags.grafana.log.format }}
             - --grafana.containerName={{ .Values.flags.grafana.containerName }}
             - --metrics.includeUname={{ .Values.flags.metrics.includeUname }}
+            {{- if .Values.grafanaApiSecret.enabled }}
+            - --grafana.apiConfigFile=/tmp/grafana/grafana-api.yaml
+            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -56,6 +59,11 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.grafanaApiSecret.enabled }}
+          volumeMounts:
+            - mountPath: /tmp/grafana
+              name: grafana-api
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -67,4 +75,10 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.grafanaApiSecret.enabled }}
+      volumes:
+        - name: grafana-api
+          secret: 
+            secretName: {{ include "cole.fullname" . }}-grafana-api
       {{- end }}

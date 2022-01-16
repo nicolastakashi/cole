@@ -65,6 +65,16 @@ serviceMonitor:
   # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   scrapeTimeout: ""
 
+grafanaApiSecret:
+  enabled: false
+  labels: {}
+  annotations: {}
+  data:
+    ## Grafana DNS address
+    address: ""
+    # Grafana ApiKey
+    apiKey: ""
+
 flags:
   # (optional) absolute path to the kubeconfig file
   kubeconfig: ""

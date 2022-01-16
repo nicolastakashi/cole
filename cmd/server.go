@@ -27,6 +27,7 @@ import (
 
 	"github.com/nicolastakashi/cole/internal/cole"
 	"github.com/nicolastakashi/cole/internal/command"
+	"github.com/nicolastakashi/cole/internal/grafana"
 	"github.com/nicolastakashi/cole/internal/k8sclient"
 	"github.com/nicolastakashi/cole/internal/logging"
 	"github.com/nicolastakashi/cole/internal/loghandler"
@@ -82,6 +83,15 @@ to quickly create a Cobra application.`,
 		})
 
 		wg.Go(func() error {
+			grafanaConfig := grafana.GrafanaConfig{
+				GrafanaApiPoolTime: time.NewTimer(2 * time.Millisecond),
+			}
+
+			err := grafanaConfig.ReadConfigFile(scmd.GrafanaApiConfigFile)
+			if err != nil {
+				return err
+			}
+
 			client, err := k8sclient.New(ctx, scmd.KubeConfig)
 
 			if err != nil {
@@ -96,6 +106,7 @@ to quickly create a Cobra application.`,
 				LogHandler:    loghandler.New(*scmd),
 				LastSinceTime: &lastSinceTime,
 				Timer:         time.NewTimer(1 * time.Millisecond),
+				GrafanaConfig: grafanaConfig,
 			}
 
 			if err := cole.Start(); err != nil {
@@ -138,6 +149,7 @@ func init() {
 	serverCmd.Flags().StringVar(&scmd.LabelSelector, "grafana.podLabelselector", "", "Grafana pod label selector")
 	serverCmd.Flags().StringVar(&scmd.Container, "grafana.containerName", "grafana", "Grafana container name (default grafana)")
 	serverCmd.Flags().StringVar(&scmd.LogFormat, "grafana.log.format", "", "Grafana pod log format")
+	serverCmd.Flags().StringVar(&scmd.GrafanaApiConfigFile, "grafana.apiConfigFile", "", "Config file with ApiKey and Grafana Address")
 	rootCmd.AddCommand(serverCmd)
 }
 
