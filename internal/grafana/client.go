@@ -70,7 +70,6 @@ func (gc *GrafanaConfig) ReadConfigFile(grafanaApiConfigFile string) error {
 }
 
 func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
-
 	c, err := gapi.New(config.Address, gapi.Config{
 		APIKey: config.ApiKey,
 	})
@@ -97,13 +96,11 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 	dashboardsInfos := []DashboardInfo{}
 
 	for _, dashboardSearchResponse := range dashboards {
-
 		start := time.Now()
 
 		dashboard, err := c.DashboardByUID(dashboardSearchResponse.UID)
 
 		if err != nil {
-
 			logrus.Info("Error in retrieving the dashboard. Trying one more time.")
 			dashboard, err = c.DashboardByUID(dashboardSearchResponse.UID)
 
