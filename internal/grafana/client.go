@@ -109,6 +109,7 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 			} else {
 				get_dashboard_error_total.Inc()
 				logrus.Error(err)
+				continue
 			}
 		}
 
