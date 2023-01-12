@@ -2,6 +2,7 @@ package grafana
 
 import (
 	"io/ioutil"
+	"strings"
 	"time"
 
 	gapi "github.com/grafana/grafana-api-golang-client"
@@ -100,15 +101,16 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 
 		dashboard, err := c.DashboardByUID(dashboardSearchResponse.UID)
 
-		if err != nil {
-			logrus.Info("Error in retrieving the dashboard. Trying one more time.")
-			dashboard, err = c.DashboardByUID(dashboardSearchResponse.UID)
+		logrus.Info(err)
 
-			if err != nil {
+		if err != nil {
+
+			if strings.Contains(err.Error(), "status: 404") {
+				logrus.Warn(err)
+			} else {
 				get_dashboard_error_total.Inc()
 				logrus.Error(err)
 			}
-
 		}
 
 		elapsedSeconds := time.Since(start).Seconds()
