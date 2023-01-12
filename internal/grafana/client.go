@@ -101,8 +101,6 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 
 		dashboard, err := c.DashboardByUID(dashboardSearchResponse.UID)
 
-		logrus.Info(err)
-
 		if err != nil {
 
 			if strings.Contains(err.Error(), "status: 404") {
