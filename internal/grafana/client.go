@@ -105,12 +105,11 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 
 			if strings.Contains(err.Error(), "status: 404") {
 				logrus.Warn(err)
-				continue
 			} else {
 				get_dashboard_error_total.Inc()
 				logrus.Error(err)
-				continue
 			}
+			continue
 		}
 
 		elapsedSeconds := time.Since(start).Seconds()
