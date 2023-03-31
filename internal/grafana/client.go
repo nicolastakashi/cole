@@ -2,6 +2,7 @@ package grafana
 
 import (
 	"io/ioutil"
+	"net/url"
 	"strings"
 	"time"
 
@@ -81,8 +82,8 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 	}
 
 	start := time.Now()
-	dashboards, err := c.FolderDashboardSearch(map[string]string{
-		"type": "dash-db",
+	dashboards, err := c.FolderDashboardSearch(url.Values{
+		"type": []string{"dash-db"},
 	})
 
 	elapsedSeconds := time.Since(start).Seconds()
