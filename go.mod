@@ -56,7 +56,7 @@ require (
 )
 
 require (
-	github.com/grafana/grafana-api-golang-client v0.18.4
+	github.com/grafana/grafana-api-golang-client v0.19.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/common v0.42.0
 )
