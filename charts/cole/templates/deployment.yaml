@@ -38,9 +38,12 @@ spec:
             - --grafana.log.format={{ .Values.flags.grafana.log.format }}
             - --grafana.containerName={{ .Values.flags.grafana.containerName }}
             - --metrics.includeUname={{ .Values.flags.metrics.includeUname }}
-            {{- if .Values.grafanaApiSecret.enabled }}
+            {{- if and (.Values.grafanaApiSecret.enabled) (not .Values.grafanaApiSecret.secretKeyReference) }}
             - --grafana.apiConfigFile=/tmp/grafana/grafana-api.yaml
             {{- end }}
+            {{- if .Values.grafanaApiSecret.secretKeyReference }}
+            - --grafana.apiConfigFile=/tmp/grafana/{{- .Values.grafanaApiSecret.secretKeyReference.key }}
+            {{- end}}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -59,10 +62,16 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.grafanaApiSecret.enabled }}
+          {{- if and (.Values.grafanaApiSecret.enabled) (not .Values.grafanaApiSecret.secretKeyReference) }}
           volumeMounts:
             - mountPath: /tmp/grafana
               name: grafana-api
+          {{- end }}
+          {{- if .Values.grafanaApiSecret.secretKeyReference }}
+          volumeMounts:
+            - mountPath: /tmp/grafana/{{- .Values.grafanaApiSecret.secretKeyReference.key }}
+              name: {{ .Values.grafanaApiSecret.secretKeyReference.name }}
+              subPath: {{ .Values.grafanaApiSecret.secretKeyReference.key }}
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -76,9 +85,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.grafanaApiSecret.enabled }}
+      {{- if and (.Values.grafanaApiSecret.enabled) (not .Values.grafanaApiSecret.secretKeyReference) }}
       volumes:
         - name: grafana-api
           secret: 
             secretName: {{ include "cole.fullname" . }}-grafana-api
+      {{- end }}
+      {{- if .Values.grafanaApiSecret.secretKeyReference }}
+      volumes:
+        - name: {{ .Values.grafanaApiSecret.secretKeyReference.name }}
+          secret: 
+            secretName: {{ .Values.grafanaApiSecret.secretKeyReference.name }}
       {{- end }}
