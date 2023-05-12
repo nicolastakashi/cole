@@ -4,6 +4,9 @@ apiVersion: monitoring.coreos.com/v1
 metadata:
   labels:
     {{- include "cole.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   name: {{ include "cole.fullname" . }}
 spec:
   endpoints:
