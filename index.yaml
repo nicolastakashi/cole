@@ -3,6 +3,16 @@ entries:
   cole:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-05-12T12:22:51.622359734Z"
+    description: A Helm chart for Cole
+    digest: ad8cf3a6ff342e5eb6a2a2bc4bbd1581dac8c789ee541d2a6de53200293389ca
+    name: cole
+    type: application
+    urls:
+    - https://github.com/nicolastakashi/cole/releases/download/cole-1.4.0/cole-1.4.0.tgz
+    version: 1.4.0
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-05-12T08:33:24.318872437Z"
     description: A Helm chart for Cole
     digest: cc6a45170d124c657fe556673e479e0eef64bad2cb3b8423beba979b88267804
@@ -41,4 +51,4 @@ entries:
     urls:
     - https://github.com/nicolastakashi/cole/releases/download/cole-1.0.0/cole-1.0.0.tgz
     version: 1.0.0
-generated: "2023-05-12T08:33:24.318893237Z"
+generated: "2023-05-12T12:22:51.622495246Z"
