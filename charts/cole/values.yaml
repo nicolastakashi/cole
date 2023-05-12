@@ -70,6 +70,20 @@ serviceMonitor:
 
 grafanaApiSecret:
   enabled: true
+
+  # secretKeyReference is used to reference an existing Kubernetes secret with Address and Grafana API Key.
+  # Use secretKeyReference if you're concerned with exposing sensitive data over you chart's values file.
+  #
+  # grafanaApiSecret.data and grafanaApiSecret.secretKeyReference should be mutually exclusive.
+  # The secret key must be a yaml file with the following content:
+  # 
+  # address: <address of grafana>
+  # apiKey: <key used to authenticate against grafana>
+  #
+  # secretKeyReference:
+  #   name: "grafana-auth"
+  #   key: "grafana.yml"
+
   labels: {}
   annotations: {}
   data:
