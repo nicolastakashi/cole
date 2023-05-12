@@ -65,6 +65,9 @@ serviceMonitor:
   # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   scrapeTimeout: ""
 
+  # Additional labels
+  labels: {}
+
 grafanaApiSecret:
   enabled: true
   labels: {}
