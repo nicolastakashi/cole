@@ -1,8 +1,9 @@
 package grafana
 
 import (
-	"io/ioutil"
+	"fmt"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -24,6 +25,10 @@ type GrafanaConfig struct {
 	GrafanaApiPoolTime *time.Timer
 	Address            string `yaml:"address"`
 	ApiKey             string `yaml:"apiKey"`
+}
+
+type GrafanaClient struct {
+	Api *gapi.Client
 }
 
 var search_dashboard_or_folder_latency = prometheus.NewHistogram(
@@ -56,7 +61,7 @@ var get_dashboard_error_total = prometheus.NewCounter(prometheus.CounterOpts{
 
 func (gc *GrafanaConfig) ReadConfigFile(grafanaApiConfigFile string) error {
 	if grafanaApiConfigFile != "" {
-		file, err := ioutil.ReadFile(grafanaApiConfigFile)
+		file, err := os.ReadFile(grafanaApiConfigFile)
 		if err != nil {
 			logrus.Error("error to read grafana api config file")
 			return err
@@ -71,18 +76,23 @@ func (gc *GrafanaConfig) ReadConfigFile(grafanaApiConfigFile string) error {
 	return nil
 }
 
-func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
-	c, err := gapi.New(config.Address, gapi.Config{
+func (config GrafanaConfig) NewClient() (GrafanaClient, error) {
+	client, err := gapi.New(config.Address, gapi.Config{
 		APIKey: config.ApiKey,
 	})
 
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return GrafanaClient{}, err
 	}
 
+	return GrafanaClient{
+		Api: client,
+	}, nil
+}
+
+func (gc GrafanaClient) GetDashboardsInfo() ([]DashboardInfo, error) {
 	start := time.Now()
-	dashboards, err := c.FolderDashboardSearch(url.Values{
+	dashboards, err := gc.Api.FolderDashboardSearch(url.Values{
 		"type": []string{"dash-db"},
 	})
 
@@ -100,7 +110,7 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 	for _, dashboardSearchResponse := range dashboards {
 		start := time.Now()
 
-		dashboard, err := c.DashboardByUID(dashboardSearchResponse.UID)
+		dashboard, err := gc.Api.DashboardByUID(dashboardSearchResponse.UID)
 
 		if err != nil {
 
@@ -110,7 +120,7 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 			}
 
 			get_dashboard_error_total.Inc()
-			logrus.Error(err)
+			logrus.Error(fmt.Printf("%s %s", err, dashboardSearchResponse.UID))
 			continue
 		}
 
@@ -118,11 +128,20 @@ func GetDashboardInfo(config GrafanaConfig) ([]DashboardInfo, error) {
 		get_dashboard_latency.Observe(elapsedSeconds)
 
 		di := DashboardInfo{
-			UID:           dashboardSearchResponse.UID,
-			IsStared:      dashboard.Meta.IsStarred,
-			Version:       dashboard.Model["version"].(float64),
-			SchemaVersion: dashboard.Model["schemaVersion"].(float64),
-			Timezone:      dashboard.Model["timezone"].(string),
+			UID:      dashboardSearchResponse.UID,
+			IsStared: dashboard.Meta.IsStarred,
+		}
+
+		if version, ok := dashboard.Model["version"].(float64); ok {
+			di.Version = version
+		}
+
+		if schemaVersion, ok := dashboard.Model["schemaVersion"].(float64); ok {
+			di.SchemaVersion = schemaVersion
+		}
+
+		if timezone, ok := dashboard.Model["timezone"].(string); ok {
+			di.Timezone = timezone
 		}
 
 		dashboardsInfos = append(dashboardsInfos, di)
