@@ -61,9 +61,18 @@ func (cole *Cole) Start() error {
 		case <-cole.GrafanaConfig.GrafanaApiPoolTime.C:
 			if cole.Scmd.GrafanaApiConfigFile != "" {
 				logrus.Info("starting pool grafana api")
-				dashboardinfos, err := grafana.GetDashboardInfo(cole.GrafanaConfig)
+
+				gc, err := cole.GrafanaConfig.NewClient()
+
 				if err != nil {
 					logrus.Error(err)
+					return err
+				}
+
+				dashboardinfos, err := gc.GetDashboardsInfo()
+				if err != nil {
+					logrus.Error(err)
+					return err
 				}
 
 				dm := metrics.DashboardMetrics{
